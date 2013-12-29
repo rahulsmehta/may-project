@@ -19,3 +19,6 @@ handlers:
 - url: /bootstrap.min.js
   static_files: bootstrap.min.js
   upload: bootstrap.min.js
+- url: /bootstrap-responsive.css
+  static_files: bootstrap-responsive.css
+  upload: bootstrap-responsive.css

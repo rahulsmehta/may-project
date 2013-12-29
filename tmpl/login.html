@@ -3,12 +3,29 @@
 <head>
   <title>Login | UCLS May Project Submission</title>
   <link rel="stylesheet" href="/bootstrap.min.css" type="text/css" />
+  <style>
+    body{padding-top:100px;}
+  </style>
 </head>
 <body>
-  <h1>Login<h1/>
-  <form action="/login" method="post">
-    <input type="text" name="email" placeholder="Email Address"/>
-    <input type="text" name="pass" placeholder="Password"/>
-    <input type="submit" value="Login"/>
-  </form>
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation"> /
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">UCLS May Project Submission Portal</a>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="col-md-6">
+    <form action="/login" method="post" role="form">
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input class="form-control" type="text" id ="email" name="email" placeholder="Email Address"/>
+    </div>
+    <div class="form-group">
+      <label for="pass">Password</label>
+      <input class="form-control" type="password" id="pass" name="pass" placeholder="Password"/><br/>
+    </div>
+    <button type="submit" class="btn btn-default">Login</button>
+    </form>
+    </div>
+  </div>
 </body>
