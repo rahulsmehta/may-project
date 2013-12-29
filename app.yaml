@@ -1,0 +1,15 @@
+application: ucls-mayproject
+runtime: python27
+api_version: 1
+version: staging
+threadsafe: yes
+
+libraries:
+- name: jinja2
+  version: latest
+
+handlers:
+- url: /
+  static_files: tmpl/login.html
+  upload: tmpl/login.html
+  secure: always
