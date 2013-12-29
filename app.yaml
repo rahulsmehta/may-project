@@ -13,3 +13,9 @@ handlers:
   static_files: tmpl/login.html
   upload: tmpl/login.html
   secure: always
+- url: /bootstrap.min.css
+  static_files: bootstrap.min.css
+  upload: bootstrap.min.css
+- url: /bootstrap.min.js
+  static_files: bootstrap.min.js
+  upload: bootstrap.min.js
