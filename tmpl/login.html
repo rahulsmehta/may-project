@@ -4,28 +4,96 @@
   <title>Login | UCLS May Project Submission</title>
   <link rel="stylesheet" href="/bootstrap.min.css" type="text/css" />
   <style>
-    body{padding-top:100px;}
+    body{padding-top:70px;}
+    .col-md-6{padding-left:10px;padding-right:10px;}
+    
   </style>
 </head>
 <body>
   <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation"> /
-    <div class="navbar-header">
       <a class="navbar-brand" href="#">UCLS May Project Submission Portal</a>
-    </div>
   </nav>
   <div class="container">
     <div class="col-md-6">
-    <form action="/login" method="post" role="form">
-    <div class="form-group">
-      <label for="email">Email Address</label>
-      <input class="form-control" type="text" id ="email" name="email" placeholder="Email Address"/>
+      <h3> Login with Existing Account</h3><br/>
+      <form action="/login" method="post" role="form">
+        <div class="form-group">
+          <label for="login-email">Email Address</label>
+          <input class="form-control" type="text" id ="login-email" name="login-email" placeholder="Email Address"/>
+        </div>
+        <div class="form-group">
+          <label for="login-pass">Password</label>
+          <input class="form-control" type="password" id="login-pass" name="login-pass" placeholder="Password"/>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-default">Login</button>
+        </div>
+      </form>
     </div>
-    <div class="form-group">
-      <label for="pass">Password</label>
-      <input class="form-control" type="password" id="pass" name="pass" placeholder="Password"/><br/>
-    </div>
-    <button type="submit" class="btn btn-default">Login</button>
-    </form>
+    <div class="col-md-6">
+      <h3>Create Account</h3><br/>
+      <form action="/create" method="post" role="form">
+        <div class="form-group">
+          <label for="signup-name">Full Name</label>
+          <input class="form-control" type="text" id ="signup-name" name="signup-name" placeholder="eg. Jane Student"/>
+        </div>
+        <div class="form-group">
+          <label for="signup-address">Mailing Address</label>
+          <input class="form-control" type="text" id ="signup-address" name="signup-address" placeholder="eg. 1362 E. 59th St., Chicago, IL, 60637"/>
+        </div>
+        <div class="form-group">
+          <label for="signup-phone">Cell Phone Number</label>
+          <input class="form-control" type="text" id ="signup-phone" name="signup-phone" placeholder="eg. 773-702-9450"/>
+        </div>
+        <div class="form-group">
+          <label for="signup-email">Email Address</label>
+          <input class="form-control" type="text" id ="signup-email" name="signup-email" placeholder="eg. jane.student@gmail.com"/>
+        </div>
+        <div class="form-group">
+          <label for="signup-parent1_name">Parent 1 Name and Email</label>
+          <input class="form-control" type="text" id ="signup-parent1_name" name="signup-parent1_name" placeholder="eg. John Parent"/>
+          <input class="form-control" type="text" id ="signup-parent1_email" name="signup-parent1_email" placeholder="eg. john.parent@gmail.com"/>
+        </div>
+        <div class="form-group">
+          <label for="signup-parent2_name">Parent 2 Name and Email (Optional)</label>
+          <input class="form-control" type="text" id ="signup-parent2_name" name="signup-parent2_name" placeholder="eg. Anna Parent"/>
+          <input class="form-control" type="text" id ="signup-parent2_email" name="signup-parent2_email" placeholder="eg. anna.parent@gmail.com"/>
+        </div>
+        <div class="form-group col-md-4">
+          <label for="signup-advisor">Advisor<br/><label>
+          <select class="form-control input" id ="signup-advisor" name="signup-advisor">
+            <option>Anderson</option>
+            <option>Beck</option>
+            <option>Collet-Jarard</option>
+            <option>Franke</option>
+            <option>Granzyk</option>
+            <option>Horton</option>
+            <option>Janda</option>
+            <option>Jurisson</option>
+            <option>Lopez</option>
+            <option>Martonffy</option>
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <label for="signup-college">College Counselor<br/><label>
+          <select class="form-control input" id ="signup-college" name="signup-college">
+            <option>Kovacs</option>
+            <option>Wagner</option>
+            <option>Warehall</option>
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <label for="signup-class">Class Counselor<br/><label>
+          <select class="form-control input" id ="signup-class" name="signup-class">
+            <option>Cunningham</option>
+            <option>Graham</option>
+            <option>Tunis</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <button type="submit" class="btn btn-default">Create Account</button>
+        </div>
+      </form>
     </div>
   </div>
 </body>
