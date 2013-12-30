@@ -25,3 +25,6 @@ handlers:
 - url: /create
   script: main.create_user
   secure: always
+- url: /login
+  script: main.authenticate_user
+  secure: always
