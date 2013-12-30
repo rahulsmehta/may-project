@@ -1,5 +1,7 @@
 import cgi
 import hashlib
+from Cookie import SimpleCookie
+from google.appengine.ext import db
 
 def make_field_storage(environ):
   """
@@ -40,3 +42,15 @@ def pass_hash(pwd):
   h.update(pwd)
   result = h.hexdigest()
   return result
+
+
+def gen_session_cookie(user):
+  session_cookie = SimpleCookie()
+  session_cookie['session'] = db.Model.key(user).id()
+  session_cookie['session']["Path"] = '/'
+
+  new_headers = [ ]
+  new_headers.extend(("set-cookie",morsel.OutputString())
+                  for morsel
+                  in  session_cookie.values())
+  return new_headers

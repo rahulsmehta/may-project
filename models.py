@@ -9,16 +9,13 @@ class User(db.Model):
    coordinator, or system admin. This entity manages privileges of all users and limits actions
    that each individual is permitted to take.
   """
-  uid = db.StringProperty()               # Hash of full name and email  
   fullname = db.StringProperty()
   address = db.StringProperty()
   phone = db.StringProperty()
   email = db.StringProperty()
-  password = db.StringProperty()          # Stores a salted hash of the password
+  password = db.StringProperty()          # Stores a sha1 hash of the password.
   parent1_name = db.StringProperty()
   parent1_email = db.StringProperty()
-  parent2_name = db.StringProperty()
-  parent2_email = db.StringProperty()
   advisor = db.StringProperty()
   college_counselor = db.StringProperty()
   class_counselor = db.StringProperty()

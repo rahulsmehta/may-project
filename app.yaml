@@ -22,9 +22,12 @@ handlers:
 - url: /bootstrap-responsive.css
   static_files: bootstrap-responsive.css
   upload: bootstrap-responsive.css
-- url: /create
+- url: /api/create
   script: main.create_user
   secure: always
-- url: /login
+- url: /api/login
   script: main.authenticate_user
   secure: always
+- url: /user
+  script: main.user_view
+  secure: always 
