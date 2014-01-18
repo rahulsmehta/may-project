@@ -67,6 +67,10 @@
         {% elif status == "reviewer" %}
         {% endif %}
         </ul>
+
+        {% if status == "student"%}
+          <a class="btn btn-primary" href="/submit">Submit May Project Proposal</a>
+        {% endif %}
       </div>
     </div>
 </body>

@@ -134,4 +134,4 @@ def logout(environ,start_response):
   print str(headers)
   start_response('302 Redirect',headers)
 
-  return []
+  return [ ]
