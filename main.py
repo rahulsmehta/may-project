@@ -79,6 +79,10 @@ def create_user(environ,start_response):
   start_response('302 Redirect', headers)
   return [ ]
 
+
+"""
+Endpoint to authenticate user.
+"""
 def authenticate_user(environ,start_response):
   fs = make_field_storage(environ)
 
@@ -104,6 +108,9 @@ def authenticate_user(environ,start_response):
       start_response('403 Forbidden',[('Location','/')])
       return []
 
+"""
+WSGI handler for user views. Corresponds to '/user' endpoint.
+"""
 def user_view(environ,start_response):
   user = None
   try:
@@ -135,6 +142,10 @@ def user_view(environ,start_response):
     start_response('200 Okay', [ ])
     return [ jinja_environment.get_template('user.html').render(**locals()).encode('utf-8') ]
 
+
+"""
+WSGI handler for log out. Clears session cookie and redirects to '/'
+"""
 def logout(environ,start_response):
   headers = [ ]
   headers.extend(clear_cookie())
@@ -143,3 +154,23 @@ def logout(environ,start_response):
   start_response('302 Redirect',headers)
 
   return [ ]
+
+"""
+WSGI handler for proposal submission.
+"""
+def submit_view(environ,start_response):
+  user = None
+  try:
+    key = environ.get("HTTP_COOKIE").split('=')[1]
+    user = User.get(key)
+  except:
+    logging.error("No user authenticated.")
+  if user is None:
+    start_response('302 Redirect',[('Location','/')])
+    return []
+  else:
+    user_name = user.fullname
+    status = user.status
+  
+  start_response('200 Okay', [ ])
+  return [ jinja_environment.get_template('user.html').render(**locals()).encode('utf-8') ]

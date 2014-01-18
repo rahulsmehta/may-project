@@ -33,6 +33,9 @@ handlers:
   secure: always 
 - url: /img
   static_dir: img
-- url: /logout
+- url: /api/logout
   script: main.logout
+  secure: always
+- url: /submit
+  script: main.submit_view
   secure: always
