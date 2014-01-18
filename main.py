@@ -59,10 +59,10 @@ def create_user(environ,start_response):
    college_counselor = form_input(fs,'signup-college'),
    class_counselor = form_input(fs,'signup-class'),
    account_approved = False,
-   assigned_proposals = [],
+   assigned_proposals = [ ],
    reviewed = False,
    proposal_submitted = False,
-   forms = [False,False,False,False],
+   forms = [False,False,False,False,False],
    proposal_approved = False,
    revisions_requested = False,
    revisions_submitted = False,
@@ -122,8 +122,16 @@ def user_view(environ,start_response):
       proposal_submitted = user.proposal_submitted
       forms = user.forms
 
-   # elif status == "reviewer":
+    elif status == "reviewer":
+      assigned_proposals = user.assigned_proposals
+
+      if len(assigned_proposals) > 0:
+        assigned_users = [ ]
+        for i in range(len(assigned_proposals)):
+          temp_user = User.get(assigned_proposals[i])
+          assigned_users.append(temp_user)
       
+
     start_response('200 Okay', [ ])
     return [ jinja_environment.get_template('user.html').render(**locals()).encode('utf-8') ]
 
