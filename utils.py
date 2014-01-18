@@ -2,7 +2,7 @@ import cgi
 import hashlib
 from Cookie import SimpleCookie
 from google.appengine.ext import db
-from datetime import *
+import datetime
 
 def make_field_storage(environ):
   """
@@ -49,9 +49,15 @@ def gen_session_cookie(user):
   Generates a response header for a session cookie containing the integer
   object 'id' for a user that has authenticated.
   """
+  
+  exp = datetime.datetime.now()+datetime.timedelta(days=1)
+
   session_cookie = SimpleCookie()
   session_cookie['session'] = db.Model.key(user)
-  session_cookie['session']["Path"] = '/'
+  session_cookie['session']["path"] = '/'
+  session_cookie['session']["expires"] = \
+    exp.strftime("%a,%d-%b-%Y %H:%M:%S CDT") 
+
 
   new_headers = [ ]
   new_headers.extend(("set-cookie",morsel.OutputString())
@@ -65,7 +71,17 @@ def clear_cookie():
 #  session_cookie['session']["Path"] = '/'
 #  session_cookie['session']["Expires"]=str(datetime.today()-timedelta(days=1))
 #
-  new_headers = [ ]
-  new_headers.extend([("set-cookie",'name=session;Expires=Tue, 15-Jan-2013 21:47:38 GMT; Path=/;')]) #TODO: FIX THE LOGOUT
+  exp = datetime.datetime.now()+datetime.timedelta(days=-2)
 
+  session_cookie = SimpleCookie()
+  session_cookie['session'] = ""
+  session_cookie['session']["path"] = '/'
+  session_cookie['session']["expires"] = \
+    exp.strftime("%a,%d-%b-%Y %H:%M:%S CDT") 
+
+
+  new_headers = [ ]
+  new_headers.extend(("set-cookie",morsel.OutputString())
+                  for morsel
+                  in  session_cookie.values())
   return new_headers

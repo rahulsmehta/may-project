@@ -116,9 +116,14 @@ def user_view(environ,start_response):
     return []
   else:
     user_name = user.fullname
-    proposal_submitted = user.proposal_submitted
-    forms = user.forms
+    status = user.status
 
+    if status == "student":
+      proposal_submitted = user.proposal_submitted
+      forms = user.forms
+
+   # elif status == "reviewer":
+      
     start_response('200 Okay', [ ])
     return [ jinja_environment.get_template('user.html').render(**locals()).encode('utf-8') ]
 
@@ -126,6 +131,7 @@ def logout(environ,start_response):
   headers = [ ]
   headers.extend(clear_cookie())
   headers.extend([('Location','/')])
+  print str(headers)
   start_response('302 Redirect',headers)
 
   return []
