@@ -1,0 +1,63 @@
+<!DOCTYPE>
+<html>
+<head>
+  <title>{{user_name}} | UCLS May Project Submission</title>
+  <link rel="stylesheet" href="/bootstrap.min.css" type="text/css" />
+  <style>
+    body{padding-top:100px;}
+    .checklist{font-size:1.3em;padding-top:25px;}
+    .todo{list-style-image:url('img/unchecked.png');}
+    .done{list-style-image:url('img/checked.png');}
+    li{padding-top:10px;padding-bottom:5px;}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation"> 
+    <a class="navbar-brand" href="#">UCLS May Project Submission Portal</a>
+    <form class="navbar-form navbar-right" action="/logout" method="post">
+    <button type="submit" class="btn btn-default">Sign Out</button>
+    </form>
+  </nav>
+  <div class="container">
+    <div class="col-md-9">
+      <h3>Welcome, {{user_name}}!</h3>
+
+      <p style="font-size:1.25em"> This is the submission portal for May Project 2014. Below is a checklist of the required items that need to be submitted. Keep in mind that
+           proposals are due no later than <b>February 21st, 2014</b>. Submission will open on <b>February 14th, 2014</b>.
+      </p>
+
+      <ul class="checklist">
+          {% if forms[0] == False %}
+            <li class="todo">Form A: May Project Supervisor Agreement Form - Due Friday, January 24th</li>
+          {% else %}
+            <li class="done">Form A: May Project Supervisor Agreement Form - Due Friday, January 24th</li>
+          {% endif %}
+
+          {% if forms[1] == False %}
+            <li class="todo">Form B: Parental Permission Form - Due Friday, February 21st</li>
+          {% else %}
+            <li class="done">Form B: Parental Permission Form - Due Friday, February 21st</li>
+          {% endif %}
+
+          {% if forms[2] == False %}
+            <li class="todo">Form C: Sponsor's Agreement Form - Due Friday, February 21st</li>
+          {% else %}
+            <li class="done">Form C: Sponsor's Agreement Form - Due Friday, February 21st</li>
+          {% endif %}
+
+          {% if proposal_submitted == False %}
+            <li class="todo"><b>May Project Proposal</b> - Due Friday, February 21st</li>
+          {% else %}
+            <li class="done">May Project Proposal </li>
+          {% endif %}
+
+          {% if forms[3] == False %}
+            <li class="todo">Eligibility Form - Due Friday, April 25th</li>
+          {% else %}
+            <li class="done">Eligibility Form - Due Friday, April 25th</li>
+          {% endif %}
+
+      </ul>
+
+    </div>
+</body>

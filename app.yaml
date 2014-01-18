@@ -31,3 +31,8 @@ handlers:
 - url: /user
   script: main.user_view
   secure: always 
+- url: /img
+  static_dir: img
+- url: /logout
+  script: main.logout
+  secure: always

@@ -23,6 +23,7 @@ class User(db.Model):
   assigned_proposals = db.StringListProperty() # List of uid's of users' proposals to review
   reviewed = db.BooleanProperty()
   proposal_submitted = db.BooleanProperty()
+  forms = db.ListProperty(item_type=bool)
   proposal_approved = db.BooleanProperty()
   revisions_requested = db.BooleanProperty()
   revisions_submitted = db.BooleanProperty()
