@@ -35,35 +35,12 @@
         <h4><u>Checklist</u></h4> 
         <ul class="checklist">
         {% if status == "student" %}
-            {% if forms[0] == False %}
-              <li class="todo">Form A: May Project Supervisor Agreement Form - Due Friday, January 24th</li>
-            {% else %}
-              <li class="done">Form A: May Project Supervisor Agreement Form - Due Friday, January 24th</li>
-            {% endif %}
-
-            {% if forms[1] == False %}
-              <li class="todo">Form B: Parental Permission Form - Due Friday, February 21st</li>
-            {% else %}
-              <li class="done">Form B: Parental Permission Form - Due Friday, February 21st</li>
-            {% endif %}
-
-            {% if forms[2] == False %}
-              <li class="todo">Form C: Sponsor's Agreement Form - Due Friday, February 21st</li>
-            {% else %}
-              <li class="done">Form C: Sponsor's Agreement Form - Due Friday, February 21st</li>
-            {% endif %}
-
-            {% if proposal_submitted == False %}
-              <li class="todo"><b>May Project Proposal</b> - Due Friday, February 21st</li>
-            {% else %}
-              <li class="done">May Project Proposal </li>
-            {% endif %}
-
-            {% if forms[3] == False %}
-              <li class="todo">Eligibility Form - Due Friday, April 25th</li>
-            {% else %}
-              <li class="done">Eligibility Form - Due Friday, April 25th</li>
-            {% endif %}
+            <li class={%if forms[1] == False %}"todo"{% else %}"done"{% endif %}>Form A: May Project Supervisor Agreement Form - Due Friday, January 24th</li>
+            <li class={%if forms[1] == False %}"todo"{% else %}"done"{% endif %}>Form B: Parental Permission Form - Due Friday, February 21st</li>
+            <li class={%if forms[1] == False %}"todo"{% else %}"done"{% endif %}>Form C: Sponsor's Agreement Form - Due Friday, February 21st</li>
+            <li class={%if forms[1] == False %}"todo"{% else %}"done"{% endif %}>Form C: Sponsor's Agreement Form - Due Friday, February 21st</li>
+            <li class={%if forms[1] == False %}"todo"{% else %}"done"{% endif %}><b>May Project Proposal</b> - Due Friday, February 21st</li>
+            <li class={%if forms[1] == False %}"todo"{% else %}"done"{% endif %}>Eligibility Form - Due Friday, April 25th</li>
         {% elif status == "reviewer" %}
         {% endif %}
         </ul>
