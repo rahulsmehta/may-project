@@ -10,8 +10,7 @@ libraries:
 
 handlers:
 - url: /
-  static_files: tmpl/login.html
-  upload: tmpl/login.html
+  script: main.index
   secure: always
 - url: /bootstrap.min.css
   static_files: bootstrap.min.css

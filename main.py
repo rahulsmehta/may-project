@@ -16,7 +16,15 @@ from models import *
 jinja_environment = jinja2.Environment(
   loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+'/tmpl/'))
 
- 
+
+def index(environ,start_response):
+  start_response('200 Okay', [ ])
+  return [ jinja_environment.get_template('login.html').render(**locals()).encode('utf-8') ]
+  
+
+"""
+WSGI handler to create a user (endpoint /api/create)
+"""
 def create_user(environ,start_response):
   fs = make_field_storage(environ)
   fail = False
@@ -31,13 +39,15 @@ def create_user(environ,start_response):
   # Check that the password and confirmation agree.
   passwd = form_input(fs,'signup-pass')
   passwd_conf = form_input(fs,'signup-pass-confirm')
-  if not passwd == passwd_conf:
+  if not passwd == passwd_conf or passwd == "":
     fail = True
   
   # If either uniqueness or pass fails, do not create account.
   if fail == True:
-    start_response('403 Forbidden',[('Location','/')]) #TODO Failure splash screen
-    return [ ]
+    msg = "There was an error during account creation! Please try again."
+    html = '<div class="alert alert-danger alert-dismissable"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+msg+'</div>'
+    start_response('200 Okay', [ ])
+    return [ jinja_environment.get_template('login.html').render(**locals()).encode('utf-8') ]
 
   # Determines user status depending on whether or not a parent was supplied.
   user_status = None
@@ -81,7 +91,7 @@ def create_user(environ,start_response):
 
 
 """
-Endpoint to authenticate user.
+WSGI handler to authenticate user.
 """
 def authenticate_user(environ,start_response):
   fs = make_field_storage(environ)
@@ -93,8 +103,10 @@ def authenticate_user(environ,start_response):
   query = User.all().filter('email',email)
 
   if query.count() < 1:
-    start_response('302 Redirect',[('Location','/')])
-    return []
+    msg = "Account not found! Please try again."
+    html = '<div class="alert alert-warning alert-dismissable"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+msg+'</div>'
+    start_response('200 Okay', [ ])
+    return [ jinja_environment.get_template('login.html').render(**locals()).encode('utf-8') ]
 
   for user in query:
     if password == user.password:
@@ -105,8 +117,10 @@ def authenticate_user(environ,start_response):
       start_response('302 Redirect',headers)
       return []
     else:
-      start_response('403 Forbidden',[('Location','/')])
-      return []
+      msg = "Incorrect password! Please try again."
+      html = '<div class="alert alert-danger alert-dismissable"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+msg+'</div>'
+      start_response('200 Okay', [ ])
+      return [ jinja_environment.get_template('login.html').render(**locals()).encode('utf-8') ]
 
 """
 WSGI handler for user views. Corresponds to '/user' endpoint.
@@ -173,4 +187,4 @@ def submit_view(environ,start_response):
     status = user.status
   
   start_response('200 Okay', [ ])
-  return [ jinja_environment.get_template('user.html').render(**locals()).encode('utf-8') ]
+  return [ jinja_environment.get_template('[submit].html').render(**locals()).encode('utf-8') ]
