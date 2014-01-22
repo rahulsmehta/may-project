@@ -1,5 +1,7 @@
 from google.appengine.ext import db
+from google.appengine.ext import blobstore
 from google.appengine.api import mail
+from tempfile import TemporaryFile
 import base64
 import os
 import re
@@ -18,6 +20,9 @@ jinja_environment = jinja2.Environment(
 
 
 def index(environ,start_response):
+  adv_list = ["Anderson","Beck","Collet-Jarard","Franke","Granzyk","Horton","Janda","Jurisson","Lopez","Martonffy"] 
+  col_list = ["Kovacs","Wagner","Warehall"] 
+  counselor_list = ["Tunis","Graham","Cunningham"]
   start_response('200 Okay', [ ])
   return [ jinja_environment.get_template('login.html').render(**locals()).encode('utf-8') ]
   
@@ -185,6 +190,29 @@ def submit_view(environ,start_response):
   else:
     user_name = user.fullname
     status = user.status
-  
-  start_response('200 Okay', [ ])
-  return [ jinja_environment.get_template('[submit].html').render(**locals()).encode('utf-8') ]
+
+  if status == "student":
+    start_response('200 Okay', [ ])
+    return [ jinja_environment.get_template('submit.html').render(**locals()).encode('utf-8') ]
+  else:
+    start_response('302 Redirect',[('Location','/user')])
+    return [ ]
+
+def upload(environ, start_response):
+  fs = make_field_storage(environ)
+  print str(fs)
+
+  length = int(environ.get('CONTENT_LENGTH', 0))
+  stream = environ['wsgi.input']
+  body = TemporaryFile(mode='w+b')
+  while length > 0:
+    part = stream.read(min(length, 1024*200)) # 200KB buffer size
+    if not part: break
+    body.write(part)
+    length -= len(part)
+  body.seek(0)
+  environ['wsgi.input'] = body
+  print str(environ['wsgi.input'])
+  return ['hallo']
+
+

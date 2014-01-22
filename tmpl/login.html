@@ -66,32 +66,25 @@
         <div class="form-group col-md-4">
           <label for="signup-advisor">Advisor<br/><label>
           <select class="form-control input" id ="signup-advisor" name="signup-advisor">
-            <option>Anderson</option>
-            <option>Beck</option>
-            <option>Collet-Jarard</option>
-            <option>Franke</option>
-            <option>Granzyk</option>
-            <option>Horton</option>
-            <option>Janda</option>
-            <option>Jurisson</option>
-            <option>Lopez</option>
-            <option>Martonffy</option>
+            {% for adv in adv_list %}
+              <option>{{adv}}</option>
+            {% endfor %}
           </select>
         </div>
         <div class="form-group col-md-4">
           <label for="signup-college">College Counselor<br/><label>
           <select class="form-control input" id ="signup-college" name="signup-college">
-            <option>Kovacs</option>
-            <option>Wagner</option>
-            <option>Warehall</option>
+            {% for col in col_list %}
+              <option>{{col}}</option>
+            {% endfor %}
           </select>
         </div>
         <div class="form-group col-md-4">
           <label for="signup-class">Class Counselor<br/><label>
           <select class="form-control input" id ="signup-class" name="signup-class">
-            <option>Cunningham</option>
-            <option>Graham</option>
-            <option>Tunis</option>
+            {% for counselor in counselor_list %}
+              <option>{{counselor}}</option>
+            {% endfor %}
           </select>
         </div>
         <div class="form-group">

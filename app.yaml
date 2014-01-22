@@ -38,3 +38,6 @@ handlers:
 - url: /submit
   script: main.submit_view
   secure: always
+- url: /api/upload
+  script: main.upload
+  secure: always
