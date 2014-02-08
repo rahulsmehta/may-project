@@ -79,7 +79,7 @@ def create_user(environ,start_response):
    college_counselor = form_input(fs,'signup-college'),
    class_counselor = form_input(fs,'signup-class'),
    account_approved = False,
-   assigned_proposals = ["ahNkZXZ-dWNscy1tYXlwcm9qZWN0chELEgRVc2VyGICAgICAgIAKDA"],
+   assigned_proposals = [ ],
    reviewed = False,
    proposal_submitted = False,
    forms = [False,False,False,False,False],
