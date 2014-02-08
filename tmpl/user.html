@@ -81,7 +81,7 @@
       <center><h3>Accounts Pending</h3></center>
       <ul>
         {% for user in pending_users %}
-          <li>{{user.ofullname}} - {{user.status}}: </br><a href="/approve/{{user.key().id()}}">Approve</a> <a href="/deny/{{user.key().id()}}">Deny</a></li>
+          <li>{{user.fullname}} - {{user.status}}: </br><a href="/approve/{{user.key().id()}}">Approve</a> <a href="/deny/{{user.key().id()}}">Deny</a></li>
         {% endfor %}
       </ul>
     </div>
