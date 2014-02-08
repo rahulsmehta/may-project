@@ -19,6 +19,7 @@ jinja_environment = jinja2.Environment(
   loader=jinja2.FileSystemLoader(os.path.dirname(__file__)+'/tmpl/'))
 
 
+
 def index(environ,start_response):
   adv_list = ["Anderson","Beck","Collet-Jarard","Franke","Granzyk","Horton","Janda","Jurisson","Lopez","Martonffy"] 
   col_list = ["Kovacs","Wagner","Warehall"] 
@@ -51,6 +52,9 @@ def create_user(environ,start_response):
   if fail == True:
     msg = "There was an error during account creation! Please try again."
     html = '<div class="alert alert-danger alert-dismissable"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+msg+'</div>'
+    adv_list = ["Anderson","Beck","Collet-Jarard","Franke","Granzyk","Horton","Janda","Jurisson","Lopez","Martonffy"] 
+    col_list = ["Kovacs","Wagner","Warehall"] 
+    counselor_list = ["Tunis","Graham","Cunningham"]
     start_response('200 Okay', [ ])
     return [ jinja_environment.get_template('login.html').render(**locals()).encode('utf-8') ]
 
@@ -74,7 +78,7 @@ def create_user(environ,start_response):
    college_counselor = form_input(fs,'signup-college'),
    class_counselor = form_input(fs,'signup-class'),
    account_approved = False,
-   assigned_proposals = [ ],
+   assigned_proposals = ["ahNkZXZ-dWNscy1tYXlwcm9qZWN0chELEgRVc2VyGICAgICAgIAKDA"],
    reviewed = False,
    proposal_submitted = False,
    forms = [False,False,False,False,False],
@@ -110,11 +114,14 @@ def authenticate_user(environ,start_response):
   if query.count() < 1:
     msg = "Account not found! Please try again."
     html = '<div class="alert alert-warning alert-dismissable"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+msg+'</div>'
+    adv_list = ["Anderson","Beck","Collet-Jarard","Franke","Granzyk","Horton","Janda","Jurisson","Lopez","Martonffy"] 
+    col_list = ["Kovacs","Wagner","Warehall"] 
+    counselor_list = ["Tunis","Graham","Cunningham"]
     start_response('200 Okay', [ ])
     return [ jinja_environment.get_template('login.html').render(**locals()).encode('utf-8') ]
 
   for user in query:
-    if password == user.password:
+    if password == user.password and user.account_approved == True:
       headers = [ ]
       headers.extend(gen_session_cookie(user))
       headers.extend([('Location','/user')])
@@ -122,7 +129,10 @@ def authenticate_user(environ,start_response):
       start_response('302 Redirect',headers)
       return []
     else:
-      msg = "Incorrect password! Please try again."
+      adv_list = ["Anderson","Beck","Collet-Jarard","Franke","Granzyk","Horton","Janda","Jurisson","Lopez","Martonffy"] 
+      col_list = ["Kovacs","Wagner","Warehall"] 
+      counselor_list = ["Tunis","Graham","Cunningham"]
+      msg = "Incorrect password or unapproved account! Please try again."
       html = '<div class="alert alert-danger alert-dismissable"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+msg+'</div>'
       start_response('200 Okay', [ ])
       return [ jinja_environment.get_template('login.html').render(**locals()).encode('utf-8') ]
@@ -153,9 +163,14 @@ def user_view(environ,start_response):
 
       if len(assigned_proposals) > 0:
         assigned_users = [ ]
+        assigned_secret = [ ]
         for i in range(len(assigned_proposals)):
           temp_user = User.get(assigned_proposals[i])
+          temp_user.secret = "Student "+str(i+1)
           assigned_users.append(temp_user)
+
+     elif status == "coordinator":
+      #TODO: ADD ALLLLLLLLL THE THINGS
       
 
     start_response('200 Okay', [ ])

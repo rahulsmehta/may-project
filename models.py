@@ -29,3 +29,4 @@ class User(db.Model):
   revisions_submitted = db.BooleanProperty()
   proposal_url = db.StringProperty()
   status = db.StringProperty() # Can ONLY be one of the following: 'student,' 'reviewer,' 'coordinator,' 'admin'
+  secret = db.StringProperty() # Student A, Student B, you get the point
