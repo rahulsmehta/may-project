@@ -11,6 +11,7 @@ import datetime
 import logging
 import time
 import datetime 
+import random
 from utils import *
 from models import * 
 
@@ -121,7 +122,7 @@ def authenticate_user(environ,start_response):
     return [ jinja_environment.get_template('login.html').render(**locals()).encode('utf-8') ]
 
   for user in query:
-    if password == user.password and user.account_approved == True:
+    if password == user.password:
       headers = [ ]
       headers.extend(gen_session_cookie(user))
       headers.extend([('Location','/user')])
@@ -132,7 +133,7 @@ def authenticate_user(environ,start_response):
       adv_list = ["Anderson","Beck","Collet-Jarard","Franke","Granzyk","Horton","Janda","Jurisson","Lopez","Martonffy"] 
       col_list = ["Kovacs","Wagner","Warehall"] 
       counselor_list = ["Tunis","Graham","Cunningham"]
-      msg = "Incorrect password or unapproved account! Please try again."
+      msg = "Incorrect password! Please try again."
       html = '<div class="alert alert-danger alert-dismissable"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'+msg+'</div>'
       start_response('200 Okay', [ ])
       return [ jinja_environment.get_template('login.html').render(**locals()).encode('utf-8') ]
@@ -158,6 +159,11 @@ def user_view(environ,start_response):
       proposal_submitted = user.proposal_submitted
       forms = user.forms
 
+    elif status == "coordinator":
+      pending_users = User.all().filter('account_approved',False)
+      approved_students = User.all().filter('account_approved',True).filter('status','student').order('fullname')
+
+
     elif status == "reviewer":
       assigned_proposals = user.assigned_proposals
 
@@ -169,8 +175,6 @@ def user_view(environ,start_response):
           temp_user.secret = "Student "+str(i+1)
           assigned_users.append(temp_user)
 
-     elif status == "coordinator":
-      #TODO: ADD ALLLLLLLLL THE THINGS
       
 
     start_response('200 Okay', [ ])
@@ -212,6 +216,23 @@ def submit_view(environ,start_response):
   else:
     start_response('302 Redirect',[('Location','/user')])
     return [ ]
+
+
+'''
+WSGI handler for account approval.
+'''
+def account_auth(environ,start_response):
+  parts = environ.get('PATH_INFO')[1:].split('/')
+  user = User.get_by_id(int(parts[1]))
+  
+  if parts[0] == "approve":
+    user.account_approved = True
+    user.put()
+  else:
+    user.delete()
+
+  start_response('302 Redirect',[('Location','/user')])
+  return [ ]
 
 def upload(environ, start_response):
   fs = make_field_storage(environ)

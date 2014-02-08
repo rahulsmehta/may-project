@@ -41,3 +41,6 @@ handlers:
 - url: /api/upload
   script: main.upload
   secure: always
+- url: /[a-zA-z]+(/[0-9]{16}) 
+  script: main.account_auth
+  secure: always

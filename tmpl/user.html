@@ -20,16 +20,20 @@
     <p class="navbar-right navbar-text">Signed in as {{user_name}}</p>
   </nav>
   <div class="container">
-    <div class="col-md-9">
+    <div class="col-md-9"><br/>
       <h3>Welcome, {{user_name}}!</h3>
       
       <p style="font-size:1.25em"> 
+      {% if user.account_approved == True %}
       {% if status=="student" %}
       This is the submission portal for May Project 2014. Below is a checklist of the required items that need to be submitted. Keep in mind that
       proposals are due no later than <b>February 21st, 2014</b>. Submission will open on <b>February 14th, 2014</b>.
       {% elif status =="reviewer" %}
       This is the submission and review portal for May Project 2014. Below is a checklist of the students that you have been assigned to review.
       Revisions and comments must be submitted on this site no later than <b>Date TBD</b>
+      {% elif status =="coordinator" %}
+      Below, you will find a listing of all accounts pending approval, form entry fields, and reviewer assignments. Please note that once the
+      review process is initiated, all subsequent changes must be made manually.
       {% endif %}
       </p>
       <div class="well">
@@ -47,6 +51,23 @@
               <li class={%if user.reviewed == False %}"todo"{% else %}"done"{% endif %}><a href="/review/{{user.key().id()}}">{{user.secret}}</a></li>
             {% endfor %}
             {% endif %}
+        {% elif status == "coordinator" %}
+        <form action="/api/forms"> <!-- TODO IMPLEMENT THIS HANDLER-->
+          <label for="coordinator-student">Student <label>
+          <select class="form-control input" id ="coordinator-student" name="coordinator-student">
+            {% for student in approved_students %}
+              <option>{{student.fullname}}</option>
+            {% endfor %}
+          </select></br>
+
+          <label for="coordinator-form">Form </label>
+          <select class="form-control input" id="coordinator-form" name="coordinator-form">
+            <option>Form A: May Project Supervisor Agreement Form</option>
+            <option>Form B: Parental Permission Form</option>
+            <option>Form C: Sponsor's Agreement Form</option>
+            <option>Form D: Eligibility Form</option>
+          </select>
+        </form>
         {% endif %}
         </ul>
         
@@ -55,4 +76,17 @@
         {% endif %}
       </div>
     </div>
+    {% if status == "coordinator" %}
+    <div class="col-md-3">
+      <center><h3>Accounts Pending</h3></center>
+      <ul>
+        {% for user in pending_users %}
+          <li>{{user.ofullname}} - {{user.status}}: </br><a href="/approve/{{user.key().id()}}">Approve</a> <a href="/deny/{{user.key().id()}}">Deny</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% else %}
+      Your account has not been approved yet - please contact the May Project Coordinator if you believe you are receiving this message in error. 
+    {% endif %}
 </body>
