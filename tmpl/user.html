@@ -43,8 +43,8 @@
             <li class={%if forms[0] == False %}"todo"{% else %}"done"{% endif %}>Form A: May Project Supervisor Agreement Form - Due Friday, January 24th</li>
             <li class={%if forms[1] == False %}"todo"{% else %}"done"{% endif %}>Form B: Parental Permission Form - Due Friday, February 21st</li>
             <li class={%if forms[2] == False %}"todo"{% else %}"done"{% endif %}>Form C: Sponsor's Agreement Form - Due Friday, February 21st</li>
-            <li class={%if forms[3] == False %}"todo"{% else %}"done"{% endif %}><b>May Project Proposal</b> - Due Friday, February 21st</li>
-            <li class={%if forms[4] == False %}"todo"{% else %}"done"{% endif %}>Form D: Eligibility Form - Due Friday, April 25th</li>
+            <li class={%if user.proposal_submitted == False %}"todo"{% else %}"done"{% endif %}><b>May Project Proposal</b> - Due Friday, February 21st</li>
+            <li class={%if forms[3] == False %}"todo"{% else %}"done"{% endif %}>Form D: Eligibility Form - Due Friday, April 25th</li>
         {% elif status == "reviewer" %}
             {% if assigned_users is defined %}
             {% for user in assigned_users %}
