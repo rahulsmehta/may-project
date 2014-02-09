@@ -12,6 +12,7 @@ import logging
 import time
 import datetime 
 import random
+import copy
 from utils import *
 from models import * 
 
@@ -161,7 +162,32 @@ def user_view(environ,start_response):
 
     elif status == "coordinator":
       pending_users = User.all().filter('account_approved',False)
+      if pending_users.count() < 1:
+        pending_users = None
       approved_students = User.all().filter('account_approved',True).filter('status','student').order('fullname')
+
+      form_list = [ ]
+      
+      form_a_list = [ ]
+      form_b_list = [ ]
+      form_c_list = [ ]
+      form_d_list = [ ]
+
+      for user in approved_students:
+        user_form = user.forms
+        if user_form[0] == False:
+          form_a_list.append(user)
+        if user_form[1] == False:
+          form_b_list.append(user)
+        if user_form[2] == False:
+          form_c_list.append(user)
+        if user_form[3] == False:
+          form_d_list.append(user)
+      
+      form_list.append(form_a_list)
+      form_list.append(form_b_list)
+      form_list.append(form_c_list)
+      form_list.append(form_d_list)
 
 
     elif status == "reviewer":
@@ -179,6 +205,34 @@ def user_view(environ,start_response):
 
     start_response('200 Okay', [ ])
     return [ jinja_environment.get_template('user.html').render(**locals()).encode('utf-8') ]
+
+"""
+WSGI handler for updating the user form data (Form A, B, etc.)
+"""
+def forms_update(environ,start_response):
+  fs = make_field_storage(environ)
+  try:
+    email = form_input(fs,'coordinator-student').split('(')[1].strip(')')
+    user = User.all().filter('email',email).get()
+    form_id = form_input(fs,'coordinator-form').split(':')[0].split(' ')[1]
+    user_forms = user.forms 
+    if form_id == "A":
+      user_forms[0]=True
+    elif form_id == "B":
+      user_forms[1]=True
+    elif form_id == "C":
+      user_forms[2] = True
+    elif form_id == "D":
+      user_forms[3] = True
+
+    user.forms=user_forms
+    user.put()
+  except:
+    logging.error("No such user found.")
+
+  start_response('302 Redirect',[('Location','/user')])
+  return [ ]  
+
 
 
 """

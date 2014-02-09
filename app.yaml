@@ -44,3 +44,6 @@ handlers:
 - url: /[a-zA-z]+(/[0-9]+) 
   script: main.account_auth
   secure: always
+- url: /api/forms
+  script: main.forms_update
+  secure: always
