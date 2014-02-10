@@ -43,12 +43,12 @@
             <li class={%if forms[0] == False %}"todo"{% else %}"done"{% endif %}>Form A: May Project Supervisor Agreement Form - Due Friday, January 24th</li>
             <li class={%if forms[1] == False %}"todo"{% else %}"done"{% endif %}>Form B: Parental Permission Form - Due Friday, February 21st</li>
             <li class={%if forms[2] == False %}"todo"{% else %}"done"{% endif %}>Form C: Sponsor's Agreement Form - Due Friday, February 21st</li>
-            <li class={%if user.proposal_submitted == False %}"todo"{% else %}"done"{% endif %}><b>May Project Proposal</b> - Due Friday, February 21st</li>
+            <li class={%if user.proposal_submitted == False %}"todo"{% else %}"done"{% endif %}><b>{% if user.proposal_submitted == True %}<a href="/view/{{user.key().id()}}">May Project Proposal</a>{% else %}May Project Proposal{%endif%}</b> - Due Friday, February 21st</li>
             <li class={%if forms[3] == False %}"todo"{% else %}"done"{% endif %}>Form D: Eligibility Form - Due Friday, April 25th</li>
         {% elif status == "reviewer" %}
             {% if assigned_users is defined %}
             {% for user in assigned_users %}
-              <li class={%if user.reviewed == False %}"todo"{% else %}"done"{% endif %}><a href="/review/{{user.key().id()}}">{{user.secret}}</a></li>
+              <li class={%if user.reviewed == False %}"todo"{% else %}"done"{% endif %}><a href="/view/{{user.key().id()}}">{{user.secret}}</a></li>
             {% endfor %}
             {% endif %}
         {% endif %}
@@ -73,6 +73,10 @@
           <br/>
           <button type="submit" class="btn btn-default">Update Forms</button>
         </form>
+        <div style="padding-top:20px;">
+        <h4>Begin Review Process</h4>
+        <a href="/review/start" class="btn btn-danger">Assign Reviewers</a>
+        </div>
         {% endif %}
         {% if status == "student"%}
           <a class="btn btn-primary" href="/submit">Submit May Project Proposal</a>
@@ -110,6 +114,14 @@
             {% for user in form_list[3] %}
               <li>{{user.fullname}}</li>
             {% endfor %}
+            </ol>
+          </div><br>
+          <div class="col-md-6">
+            <h4>Students with Pending Proposals</h4>
+            <ol>
+              {% for user in form_list[4] %}
+              <li>{{user.fullname}}</li>
+              {% endfor %}
             </ol>
           </div>
         {% endif %}

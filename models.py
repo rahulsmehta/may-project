@@ -27,6 +27,10 @@ class User(db.Model):
   proposal_approved = db.BooleanProperty()
   revisions_requested = db.BooleanProperty()
   revisions_submitted = db.BooleanProperty()
-  proposal_url = db.StringProperty()
+  proposal = db.BlobProperty()
+  proposal_filetype = db.StringProperty()
+  proposal_title = db.StringProperty()
+  proposal_authors = db.StringProperty()
+  proposal_summary = db.StringProperty(multiline=True)
   status = db.StringProperty() # Can ONLY be one of the following: 'student,' 'reviewer,' 'coordinator,' 'admin'
   secret = db.StringProperty() # Student A, Student B, you get the point

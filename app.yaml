@@ -41,9 +41,15 @@ handlers:
 - url: /api/upload
   script: main.upload
   secure: always
-- url: /[a-zA-z]+(/[0-9]+) 
+- url: /[approve|deny]+(/[0-9]+) 
   script: main.account_auth
   secure: always
 - url: /api/forms
   script: main.forms_update
+  secure: always
+- url: /view+(/[0-9]+)
+  script: main.view_proposal
+  secure: always
+- url: /review/start
+  script: main.start_review
   secure: always

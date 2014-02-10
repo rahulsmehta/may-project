@@ -87,7 +87,7 @@ def create_user(environ,start_response):
    proposal_approved = False,
    revisions_requested = False,
    revisions_submitted = False,
-   proposal_url = None,
+   proposal = None,
    status = user_status
   )
   new_user.put()
@@ -172,6 +172,7 @@ def user_view(environ,start_response):
       form_b_list = [ ]
       form_c_list = [ ]
       form_d_list = [ ]
+      prop_list = [ ]
 
       for user in approved_students:
         user_form = user.forms
@@ -183,11 +184,14 @@ def user_view(environ,start_response):
           form_c_list.append(user)
         if user_form[3] == False:
           form_d_list.append(user)
+        if user.proposal_submitted == False:
+          prop_list.append(user)
       
       form_list.append(form_a_list)
       form_list.append(form_b_list)
       form_list.append(form_c_list)
       form_list.append(form_d_list)
+      form_list.append(prop_list)
 
 
     elif status == "reviewer":
@@ -197,7 +201,7 @@ def user_view(environ,start_response):
         assigned_users = [ ]
         assigned_secret = [ ]
         for i in range(len(assigned_proposals)):
-          temp_user = User.get(assigned_proposals[i])
+          temp_user = User.get_by_id(int(assigned_proposals[i]))
           temp_user.secret = "Student "+str(i+1)
           assigned_users.append(temp_user)
 
@@ -289,20 +293,72 @@ def account_auth(environ,start_response):
   return [ ]
 
 def upload(environ, start_response):
+  user = None
+  try:
+    key = environ.get("HTTP_COOKIE").split('=')[1]
+    user = User.get(key)
+  except:
+    logging.error("No user authenticated.")
+  if user is None:
+    start_response('302 Redirect',[('Location','/')])
+    return []
+
   fs = make_field_storage(environ)
-  print str(fs)
+  user.proposal = None
+  user.put()
 
-  length = int(environ.get('CONTENT_LENGTH', 0))
-  stream = environ['wsgi.input']
-  body = TemporaryFile(mode='w+b')
-  while length > 0:
-    part = stream.read(min(length, 1024*200)) # 200KB buffer size
-    if not part: break
-    body.write(part)
-    length -= len(part)
-  body.seek(0)
-  environ['wsgi.input'] = body
-  print str(environ['wsgi.input'])
-  return ['hallo']
+  user.proposal = db.Blob(fs['upload-file'].file.read())
+  
+  fn = fs['upload-file'].filename.split(".")
+  user.proposal_filetype = fn[len(fn)-1]
+  user.proposal_title = form_input(fs,'upload-title')
+  user.proposal_authors = form_input(fs,'upload-author')
+  user.proposal_summary = form_input(fs,'upload-summary')
+  user.proposal_submitted = True
+  user.put()
 
+  start_response('302 Redirect',[('Location','/user')])
+  return []
 
+def view_proposal(environ,start_response):
+  parts = environ.get('PATH_INFO')[1:].split('/')
+  student = User.get_by_id(int(parts[1]))
+  
+  proposal = student.proposal
+  print dir(proposal)
+  block_size = 4096
+
+  status = "200 Okay"
+  fn = str(student.key().id())+"."+student.proposal_filetype
+  headers = [('Content-Type','application/text'),('Content-Disposition','attachment; filename='+str(fn))]
+  start_response(status,headers)
+
+  return [proposal]
+
+def start_review(environ,start_response):
+  students = User.all().filter('account_approved',True).filter('status','student').filter('proposal_submitted',True).order('fullname')
+  reviewers = User.all().filter('account_approved',True).filter('status','reviewer')
+
+  #Copy students to an array
+  student_list = [ ]
+  for user in students:
+    student_list.append(user)
+
+  random.shuffle(student_list)
+
+  for reviewer in reviewers:
+    assigned_proposals = [ ]
+    try:
+      assigned_proposals.append(str(student_list.pop().key().id()))
+      assigned_proposals.append(str(student_list.pop().key().id()))
+      assigned_proposals.append(str(student_list.pop().key().id()))
+    except:
+      logging.error("Reached end of list.")
+
+    reviewer.assigned_proposals = assigned_proposals
+    reviewer.put()
+
+  status = "302 Redirect"
+  headers = [('Location','/user')]
+  start_response(status,headers)
+  return [ ]
