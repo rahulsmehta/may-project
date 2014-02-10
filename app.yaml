@@ -47,9 +47,18 @@ handlers:
 - url: /api/forms
   script: main.forms_update
   secure: always
-- url: /view+(/[0-9]+)
-  script: main.view_proposal
+- url: /download+(/[0-9]+)
+  script: main.download_proposal
   secure: always
 - url: /review/start
   script: main.start_review
+  secure: always
+- url: /review+(/[0-9]+)
+  script: main.review_proposal
+  secure: always
+- url: /api/view
+  script: main.coordinator_view
+  secure: always
+- url: /view+(/[0-9]+)
+  script: main.view_proposal
   secure: always

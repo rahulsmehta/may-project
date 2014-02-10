@@ -54,6 +54,19 @@
         {% endif %}
         </ul>
         {% if status == "coordinator" %}
+        <h4 style="padding-top:20px;">View Submission</h4>
+        <form action="/api/view" method="post"> <!-- TODO IMPLEMENT THIS HANDLER-->
+          <label for="coordinator-student">Student<br/><label>
+          <select class="form-control input" id ="coordinator-student" name="coordinator-student">
+            {% for student in submitted_students %}
+              <option>{{student.fullname}} ({{student.email}})</option>
+            {% endfor %}                                                                                                                                              
+          </select>
+          <br/>
+          <button type="submit" class="btn btn-default">View Proposal</button>
+        </form>
+
+
         <h4 style="padding-top:20px;">Update Form Information</h4>
         <form action="/api/forms" method="post"> <!-- TODO IMPLEMENT THIS HANDLER-->
           <label for="coordinator-student">Student<br/><label>
@@ -119,6 +132,9 @@
           <div class="col-md-6">
             <h4>Students with Pending Proposals</h4>
             <ol>
+              {% if form_list[4]|length < 1 %}
+              There are no pending proposals.
+              {% endif %}
               {% for user in form_list[4] %}
               <li>{{user.fullname}}</li>
               {% endfor %}

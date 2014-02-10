@@ -1,0 +1,44 @@
+<!DOCTYPE>
+<html>
+<head>
+  <title>{{user.fullname}} | UCLS May Project Submission</title>
+  <link rel="stylesheet" href="/bootstrap.min.css" type="text/css" />
+  <style>
+    body{padding-top:65px;}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation"> 
+    <a class="navbar-brand" href="/user">UCLS May Project Submission Portal</a>
+    <form class="navbar-form navbar-right" style="padding-right:20px;" action="/api/logout" method="post">
+    <button type="submit" class="btn btn-inverse">Sign Out</button>
+    </form>
+    <p class="navbar-right navbar-text">Signed in as {{user_name}}</p>
+  </nav>
+  <div class="container">
+    <div class="col-md-6">
+      <h4> View May Project Proposal</h4><br/>
+      {% if user.status == "coordinator" or user.status == "student"%}
+        <div><b>Author(s):</b> {{student.proposal_authors}}</b></div>
+      {% endif %}
+      <div><b>Proposal Title:</b> {{student.proposal_title}}</div><br/>
+      <div><b>Proposal Summary:</b> {{student.proposal_summary}}</div><br/>
+      {% if user.status == "coordinator" and reviewers%}
+        <div><b>Reviewer(s):</b></div>
+        {% for reviewer in reviewers%}
+          <div>{{reviewer.fullname}}</div>
+        {% endfor %}
+      {% endif %}
+      <br/>
+
+      <div><a class="btn btn-default" href="/download/{{student.key().id()}}">Download Proposal</a></div><br/>
+
+      {% if user.status == "reviewer" %}
+        <div><a class="btn btn-default" href="/review/{{student.key().id()}}">Review Proposal</a></div>
+      {% endif %}
+    </div>
+
+
+    </div>
+  </div>
+</body>

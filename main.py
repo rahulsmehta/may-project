@@ -174,6 +174,8 @@ def user_view(environ,start_response):
       form_d_list = [ ]
       prop_list = [ ]
 
+      submitted_students = [ ]
+
       for user in approved_students:
         user_form = user.forms
         if user_form[0] == False:
@@ -186,6 +188,9 @@ def user_view(environ,start_response):
           form_d_list.append(user)
         if user.proposal_submitted == False:
           prop_list.append(user)
+        if user.proposal_submitted == True:
+          submitted_students.append(user)
+          
       
       form_list.append(form_a_list)
       form_list.append(form_b_list)
@@ -320,7 +325,7 @@ def upload(environ, start_response):
   start_response('302 Redirect',[('Location','/user')])
   return []
 
-def view_proposal(environ,start_response):
+def download_proposal(environ,start_response):
   parts = environ.get('PATH_INFO')[1:].split('/')
   student = User.get_by_id(int(parts[1]))
   
@@ -335,30 +340,124 @@ def view_proposal(environ,start_response):
 
   return [proposal]
 
+#TODO NEED TO ADD 2 REVIEWERS BY DEFAULT AND A THIRD IF THERE'S A DISCREPANCY
 def start_review(environ,start_response):
   students = User.all().filter('account_approved',True).filter('status','student').filter('proposal_submitted',True).order('fullname')
   reviewers = User.all().filter('account_approved',True).filter('status','reviewer')
 
   #Copy students to an array
   student_list = [ ]
+  reviewer_list = [ ]
   for user in students:
     student_list.append(user)
+  for user in reviewers:
+    reviewer_list.append(user)
 
   random.shuffle(student_list)
+  random.shuffle(reviewer_list)
 
-  for reviewer in reviewers:
+  while len(reviewer_list)>0:
     assigned_proposals = [ ]
     try:
-      assigned_proposals.append(str(student_list.pop().key().id()))
-      assigned_proposals.append(str(student_list.pop().key().id()))
-      assigned_proposals.append(str(student_list.pop().key().id()))
+      reviewer_a = reviewer_list.pop()
+      reviewer_b = reviewer_list.pop()
+    except:
+      logging.error("No more reviewers.")
+    try:
+      for i in range(3):
+        temp_student = student_list.pop()
+        temp_student.reviewers = [ ]
+        temp_student.reviewers.append(str(reviewer_a.key().id()))
+        temp_student.reviewers.append(str(reviewer_b.key().id()))
+        assigned_proposals.append(str(temp_student.key().id()))
+        temp_student.put()
     except:
       logging.error("Reached end of list.")
+    print assigned_proposals
 
-    reviewer.assigned_proposals = assigned_proposals
-    reviewer.put()
+    reviewer_a.assigned_proposals = assigned_proposals
+    reviewer_b.assigned_proposals = assigned_proposals
+    reviewer_a.put()
+    reviewer_b.put()
 
   status = "302 Redirect"
   headers = [('Location','/user')]
   start_response(status,headers)
   return [ ]
+
+
+"""
+WSGI handler for the coordinator viewing proposals.
+"""
+def coordinator_view(environ,start_response):
+  fs = make_field_storage(environ)
+  try:
+    email = form_input(fs,'coordinator-student').split('(')[1].strip(')')
+    student = User.all().filter('email',email).get()
+
+    prop_url = "/view/"+str(student.key().id())
+    headers = [('Location',prop_url)]
+  except:
+    logging.error("No students found.")
+    headers = [('Location','/user')]
+
+  status = "302 Redirect"
+
+  start_response(status,headers)
+  return [ ]
+
+"""
+WSGI handler for viewing proposals on a page
+"""
+def view_proposal(environ,start_response):
+  user = None
+  try:
+    key = environ.get("HTTP_COOKIE").split('=')[1]
+    user = User.get(key)
+  except:
+    logging.error("No user authenticated.")
+  if user is None:
+    start_response('302 Redirect',[('Location','/')])
+    return []
+  else:
+    user_name = user.fullname
+    status = user.status
+
+  parts = environ.get('PATH_INFO')[1:].split('/')
+  student = User.get_by_id(int(parts[1]))
+  try:
+    reviewers = [ ]
+    for str_id in student.reviewers:
+      int_id = int(str_id)
+      temp_user = User.get_by_id(int_id)
+      reviewers.append(temp_user)
+  except:
+    logging.error("Reviewer(s) not assigned yet.")
+    reviewers = None
+
+  start_response('200 Okay', [ ])
+  return [ jinja_environment.get_template('view_prop.html').render(**locals()).encode('utf-8') ]
+
+"""
+WSGI handler for reviewing a proposal.
+"""
+def review_proposal(environ,start_response):
+  user = None
+  try:
+    key = environ.get("HTTP_COOKIE").split('=')[1]
+    user = User.get(key)
+  except:
+    logging.error("No user authenticated.")
+  if user is None:
+    start_response('302 Redirect',[('Location','/')])
+    return []
+  else:
+    user_name = user.fullname
+    status = user.status
+
+  parts = environ.get('PATH_INFO')[1:].split('/')
+  student = User.get_by_id(int(parts[1]))
+
+  start_response('200 Okay', [ ])
+  return [ jinja_environment.get_template('review.html').render(**locals()).encode('utf-8') ]
+  

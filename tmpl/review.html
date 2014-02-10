@@ -1,0 +1,127 @@
+<!DOCTYPE>
+<html>
+<head>
+  <title>{{user.fullname}} | UCLS May Project Submission</title>
+  <link rel="stylesheet" href="/bootstrap.min.css" type="text/css" />
+  <style>
+    body{padding-top:65px;}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation"> 
+    <a class="navbar-brand" href="/user">UCLS May Project Submission Portal</a>
+    <form class="navbar-form navbar-right" style="padding-right:20px;" action="/api/logout" method="post">
+    <button type="submit" class="btn btn-inverse">Sign Out</button>
+    </form>
+    <p class="navbar-right navbar-text">Signed in as {{user_name}}</p>
+  </nav>
+  <div class="container">
+    <div class="col-md-8">
+      <h4>Reviewing Proposal #{{student.key().id()}}</h4><br/><!--IMPLEMENT THIS DAMN HANDLER-->
+      <p>Please limit comments to 500 characters or less. If you wish to provide more extensive feedback on a particular
+      item, there is space available in the "Summary Comments" section at the bottom.</p>
+      <form id="file" action="/review/{{student.key().id()}}/submit" enctype="multipart/form-data" method="post" role="form">
+        <div class="form-group">
+          <label for="q1">Has the student developed a significant project?</label>
+          <input class="form-control" id ="q1" name="q1" placeholder="Comments" maxlength="500"/>
+          <select class="form-control" style="width:70px;" id="q1-score" name="q1-score">
+            {% for i in range(1,11) %}
+              <option>{{i}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="q2">Is the student's plan for carrying out the project feasible?</label>
+          <input class="form-control" id ="q2" name="q2" placeholder="Comments" maxlength="500"/>
+          <select class="form-control" style="width:70px;" id="q2-score" name="q2-score">
+            {% for i in range(1,11) %}
+              <option>{{i}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="q3">Does the proposal include appropriate research components?</label>
+          <input class="form-control" id ="q3" name="q3" placeholder="Comments" maxlength="500"/>
+          <select class="form-control" style="width:70px;" id="q3-score" name="q3-score">
+            {% for i in range(1,11) %}
+              <option>{{i}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="q4">Will the project adequately use the three weeks allotted for May Project (30 hrs/week)?</label>
+          <input class="form-control" id ="q4" name="q4" placeholder="Comments" maxlength="500"/>
+          <select class="form-control" style="width:70px;" id="q4-score" name="q4-score">
+            {% for i in range(1,11) %}
+              <option>{{i}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="q5">Is this project likely to produce a significant result regardless of its "success"?</label>
+          <input class="form-control" id ="q5" name="q5" placeholder="Comments" maxlength="500"/>
+          <select class="form-control" style="width:70px;" id="q5-score" name="q5-score">
+            {% for i in range(1,11) %}
+              <option>{{i}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="q6">If an Independent Project, is there an expert upon whose work or guidance the stuent might rely? If a Sponsored Project (shadowing, internships, or volunteering), is the plan appropriate and feasible?</label>
+          <input class="form-control" id ="q6" name="q6" placeholder="Comments" maxlength="500"/>
+          <select class="form-control" style="width:70px;" id="q6-score" name="q6-score">
+            {% for i in range(1,11) %}
+              <option>{{i}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="q7">Has the student described an appropriate way to evaluate the project upon completion?</label>
+          <input class="form-control" id ="q7" name="q7" placeholder="Comments" maxlength="500"/>
+          <select class="form-control" style="width:70px;" id="q7-score" name="q7-score">
+            {% for i in range(1,11) %}
+              <option>{{i}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="q8">Do plans for presenting and exhibiting the project appear likely to present the project well?</label>
+          <input class="form-control" id ="q8" name="q8" placeholder="Comments" maxlength="500"/>
+          <select class="form-control" style="width:70px;" id="q8-score" name="q8-score">
+            {% for i in range(1,11) %}
+              <option>{{i}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="q9">Does the proposal overall appear thoughtful and well planned out?</label>
+          <input class="form-control" id ="q9" name="q9" placeholder="Comments" maxlength="500"/>
+          <select class="form-control" style="width:70px;" id="q9-score" name="q9-score">
+            {% for i in range(1,11) %}
+              <option>{{i}}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="q10">Do you expect that this project will reflect well on the student and U-High?</label>
+          <input class="form-control" id ="q10" name="q10" placeholder="Comments" maxlength="500"/>
+          <select class="form-control" style="width:70px;" id="q10-score" name="q10-score">
+            {% for i in range(1,11) %}
+              <option>{{i}}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+        <label for="comments">Please include any summary comments below.</label>
+        <textarea class="form-control" type="text" id="comments" rows=10 name="comments" > </textarea>
+        <div class="form-group">
+          <button type="submit" class="btn btn-default">Submit Comments</button>
+        </div>
+      </form>
+    </div>
+
+
+    </div>
+  </div>
+</body>
