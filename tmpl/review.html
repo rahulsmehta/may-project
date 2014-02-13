@@ -20,7 +20,7 @@
       <h4>Reviewing Proposal #{{student.key().id()}}</h4><br/><!--IMPLEMENT THIS DAMN HANDLER-->
       <p>Please limit comments to 500 characters or less. If you wish to provide more extensive feedback on a particular
       item, there is space available in the "Summary Comments" section at the bottom.</p>
-      <form id="file" action="/review/{{student.key().id()}}/submit" enctype="multipart/form-data" method="post" role="form">
+      <form id="file" action="/review/{{student.key().id()}}" enctype="multipart/form-data" method="post" role="form">
         <div class="form-group">
           <label for="q1">Has the student developed a significant project?</label>
           <input class="form-control" id ="q1" name="q1" placeholder="Comments" maxlength="500"/>

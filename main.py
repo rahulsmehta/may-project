@@ -206,8 +206,14 @@ def user_view(environ,start_response):
         assigned_users = [ ]
         assigned_secret = [ ]
         for i in range(len(assigned_proposals)):
-          temp_user = User.get_by_id(int(assigned_proposals[i]))
+          user_id = int(assigned_proposals[i])
+          temp_user = User.get_by_id(user_id)
           temp_user.secret = "Student "+str(i+1)
+          user_review = Review.all().filter('submitter',assigned_proposals[i]).filter('reviewer',str(user.key().id())).get()
+          try:
+            temp_user.reviewed = user_review.complete
+          except:
+            temp_user.reviewed = False
           assigned_users.append(temp_user)
 
       
@@ -251,7 +257,6 @@ def logout(environ,start_response):
   headers = [ ]
   headers.extend(clear_cookie())
   headers.extend([('Location','/')])
-  print str(headers)
   start_response('302 Redirect',headers)
 
   return [ ]
@@ -330,7 +335,6 @@ def download_proposal(environ,start_response):
   student = User.get_by_id(int(parts[1]))
   
   proposal = student.proposal
-  print dir(proposal)
   block_size = 4096
 
   status = "200 Okay"
@@ -356,29 +360,37 @@ def start_review(environ,start_response):
   random.shuffle(student_list)
   random.shuffle(reviewer_list)
 
+
   while len(reviewer_list)>0:
     assigned_proposals = [ ]
     try:
       reviewer_a = reviewer_list.pop()
+    except:
+      reviewer_a = None
+      logging.error("No reviewers left.")
+    try:
       reviewer_b = reviewer_list.pop()
     except:
-      logging.error("No more reviewers.")
+      reviewer_b = None
+      logging.error("No reviewers left.")
     try:
       for i in range(3):
         temp_student = student_list.pop()
         temp_student.reviewers = [ ]
-        temp_student.reviewers.append(str(reviewer_a.key().id()))
-        temp_student.reviewers.append(str(reviewer_b.key().id()))
+        if reviewer_a is not None:
+          temp_student.reviewers.append(str(reviewer_a.key().id()))
+        if reviewer_b is not None:
+          temp_student.reviewers.append(str(reviewer_b.key().id()))
         assigned_proposals.append(str(temp_student.key().id()))
         temp_student.put()
     except:
       logging.error("Reached end of list.")
-    print assigned_proposals
-
-    reviewer_a.assigned_proposals = assigned_proposals
-    reviewer_b.assigned_proposals = assigned_proposals
-    reviewer_a.put()
-    reviewer_b.put()
+    if reviewer_a is not None:
+      reviewer_a.assigned_proposals = assigned_proposals
+      reviewer_a.put()
+    if reviewer_b is not None:
+      reviewer_b.assigned_proposals = assigned_proposals
+      reviewer_b.put()
 
   status = "302 Redirect"
   headers = [('Location','/user')]
@@ -422,18 +434,36 @@ def view_proposal(environ,start_response):
   else:
     user_name = user.fullname
     status = user.status
-
+  
   parts = environ.get('PATH_INFO')[1:].split('/')
   student = User.get_by_id(int(parts[1]))
+
+  #TODO: add the third reviewer part!!!!!!!
+  #Begin third reviewer needed
+  student_reviews = Review.all().filter('submitter',str(student.key().id())) #Get all reviews for prop submitted by student
+  
+  #Calculate whether or not there's a large differential
+
+
+  is_current_reviewer = False
   try:
     reviewers = [ ]
     for str_id in student.reviewers:
       int_id = int(str_id)
+      if user.key().id() == int_id:
+        is_current_reviewer = True
       temp_user = User.get_by_id(int_id)
       reviewers.append(temp_user)
   except:
     logging.error("Reviewer(s) not assigned yet.")
     reviewers = None
+
+  if is_current_reviewer == True:
+    review = None
+    for rev in student_reviews:
+      if rev.reviewer == str(user.key().id()):
+        review = rev
+
 
   start_response('200 Okay', [ ])
   return [ jinja_environment.get_template('view_prop.html').render(**locals()).encode('utf-8') ]
@@ -458,6 +488,36 @@ def review_proposal(environ,start_response):
   parts = environ.get('PATH_INFO')[1:].split('/')
   student = User.get_by_id(int(parts[1]))
 
-  start_response('200 Okay', [ ])
-  return [ jinja_environment.get_template('review.html').render(**locals()).encode('utf-8') ]
-  
+  if environ['REQUEST_METHOD'] == "GET":
+    start_response('200 Okay', [ ])
+    return [ jinja_environment.get_template('review.html').render(**locals()).encode('utf-8') ]
+  elif environ['REQUEST_METHOD'] == "POST":
+    try:
+      r = Review.all().filter("submitter",str(parts[1])).filter("reviewer",str(user.key().id())).get()
+      r.delete()
+    except:
+      logging.error("No such review found.")
+
+    fs = make_field_storage(environ)
+    this_review = Review(
+      reviewer = str(user.key().id()),
+      reviewer_fullname = user.fullname,
+      submitter = str(student.key().id()),
+      scores = [ ],
+      comments = [ ],
+      summary_comments = None,
+      complete = False
+    )
+    for i in range(10):
+      add = str(i+1)
+      foo = int(form_input(fs,'q'+add+'-score'))
+      this_review.scores.append(foo)
+      this_review.comments.append(form_input(fs,'q'+add))
+
+    this_review.summary_comments = form_input(fs,'comments')
+    this_review.complete = True
+    this_review.put()
+
+    start_response('302 Redirect', [('Location','/user')])
+    return [ ]
+

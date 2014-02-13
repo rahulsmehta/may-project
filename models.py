@@ -27,6 +27,7 @@ class User(db.Model):
   proposal_submitted = db.BooleanProperty()
   forms = db.ListProperty(item_type=bool)
   proposal_approved = db.BooleanProperty()
+  third_rev_needed = db.BooleanProperty()
   revisions_requested = db.BooleanProperty()
   revisions_submitted = db.BooleanProperty()
   proposal = db.BlobProperty()
@@ -41,20 +42,24 @@ class Review(db.Model):
   """
   This class represents a 'review' for the proposal in question.
   """
-  submitting_user = db.StringProperty() #stringified id of reviewer
+  reviewer = db.StringProperty() #stringified id of reviewer
+  reviewer_fullname = db.StringProperty()
+  submitter = db.StringProperty()
   scores = db.ListProperty(item_type=int)
   comments = db.StringListProperty()
   summary_comments = db.TextProperty()
-  proposal_status = db.StringProperty() #Can be one of the following: 'approved','revisions','rewrite','not_approved'
   complete = db.BooleanProperty(default=False)
 
-  def proposal_status(self):
-    temp_scores = self.scores
-    if temp_scores is None:
+  def proposal_score(self):
+    if self.scores is None:
       return "not_reviewed"
     total = 0
-    while len(temp_scores)>0:
-      total+=temp_scores.pop()
+    for num in self.scores:
+      total+=num
+    return total
+
+  def proposal_status(self):
+    total = self.proposal_score()
 
     if total > 90:
       return "approved"
@@ -64,5 +69,18 @@ class Review(db.Model):
       return "rewrite"
     else:
       return "not_approved"
+
+  def status_pretty(self):
+    total = self.proposal_score()
+
+    if total > 90:
+      return "Proposal Approved"
+    elif total > 75:
+      return "Needs Revisions"
+    elif total > 55:
+      return "Rewrite Required"
+    else:
+      return "Proposal Denied"
+
 
 

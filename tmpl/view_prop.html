@@ -4,8 +4,29 @@
   <title>{{user.fullname}} | UCLS May Project Submission</title>
   <link rel="stylesheet" href="/bootstrap.min.css" type="text/css" />
   <style>
-    body{padding-top:65px;}
+    body{padding-top:65px;padding-bottom:65px;}
   </style>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  <script>
+  $(document).ready(
+    function(){
+      $(".tohide").hide();
+    }
+  );
+//  $(document).ready(
+//    function(){
+//    $("#comments").hide();
+//      $("#comments_btn").click(function(){
+//        $("#comments").toggle('fast');
+//        if ($("#comments_btn").html() == "Show Full Comments"){
+//          $("#comments_btn").html("Hide Full Comments")
+//        }
+//        else{
+//          $("#comments_btn").html("Show Full Comments")
+//        }
+//        });
+//    });
+  </script>
 </head>
 <body>
   <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation"> 
@@ -17,7 +38,7 @@
   </nav>
   <div class="container">
     <div class="col-md-6">
-      <h4> View May Project Proposal</h4><br/>
+      <h4> May Project Proposal #{{student.key().id()}}</h4><br/>
       {% if user.status == "coordinator" or user.status == "student"%}
         <div><b>Author(s):</b> {{student.proposal_authors}}</b></div>
       {% endif %}
@@ -39,6 +60,116 @@
     </div>
 
 
+    <div class="col-md-6">
+      {% if user.status == "reviewer" and review %}
+        {% if is_current_reviewer == True %}
+        <!--Render just the one review they have completed -->
+        <div>
+        <p><b><u>Review Submitted</b></u></p>
+        <p>Score: {{review.proposal_score()}}/100</p>
+        <p>Proposal Status: <b>{{review.status_pretty()}}</b></p>
+        </div>
+        <a href="#" onclick="$('#comments{{user.key().id()}}').toggle('fast');" id="comments_btn" class="btn btn-default">Toggle Full Comments</a>
+        <div id="comments{{user.key().id()}}" class="tohide" style="padding-top:10px;">
+        <div style="padding-bottom:10px;"><b>Has the student developed a significant project?</b></div>
+        <span class="label label-primary"><b>{{review.scores[0]}}/10</b></span>
+        <span>{{review.comments[0]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Is the student's plan for carrying out the project feasible?</b></div>
+        <span class="label label-primary"><b>{{review.scores[1]}}/10</b></span>
+        <span>{{review.comments[1]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Does the proposal include appropriate research components?</b></div>
+        <span class="label label-primary"><b>{{review.scores[2]}}/10</b></span>
+        <span>{{review.comments[2]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Will the project adequately use the three weeks allotted for May Project (30 hrs/week)?</b></div>
+        <span class="label label-primary"><b>{{review.scores[3]}}/10</b></span>
+        <span>{{review.comments[3]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Is this project likely to produce a significant result regardless of its "success"?</b></div>
+        <span class="label label-primary"><b>{{review.scores[4]}}/10</b></span>
+        <span>{{review.comments[4]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>If an Independent Project, is there an expert upon whose work or guidance the stuent might rely? If a Sponsored Project (shadowing, internships, or volunteering), is the plan appropriate and feasible?</b></div>
+        <span class="label label-primary"><b>{{review.scores[5]}}/10</b></span>
+        <span>{{review.comments[5]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Has the student described an appropriate way to evaluate the project upon completion?</b></div>
+        <span class="label label-primary"><b>{{review.scores[6]}}/10</b></span>
+        <span>{{review.comments[6]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Do plans for presenting and exhibiting the project appear likely to present the project well?</b></div>
+        <span class="label label-primary"><b>{{review.scores[7]}}/10</b></span>
+        <span>{{review.comments[7]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Does the proposal overall appear thoughtful and well planned out?</b></div>
+        <span class="label label-primary"><b>{{review.scores[8]}}/10</b></span>
+        <span>{{review.comments[8]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Do you expect that this project will reflect well on the student and U-High?</b></div>
+        <span class="label label-primary"><b>{{review.scores[9]}}/10</b></span>
+        <span>{{review.comments[9]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Summary Comments</b></div>
+        <span>{{review.summary_comments}}</span>
+
+        </div>
+        {% endif %}
+      {% elif user.status == "student" or user.status=="coordinator" %} <!--Student-->
+      {% for review in student_reviews %} 
+        <div style="padding-bottom:20px;">
+        <p><b><u>Review Submitted by {% if user.status=="coordinator" %}{{review.reviewer_fullname}} {%else%}#{{review.reviewer}} {% endif %}</b></u></p>
+        <p>Score: {{review.proposal_score()}}/100</p>
+        <p>Proposal Status: <b>{{review.status_pretty()}}</b></p>
+        <a href="#" onclick="$('#comments{{review.reviewer}}').toggle('fast');" id="comments_btn" class="btn btn-default">Toggle Full Comments</a>
+        </div>
+        <div id="comments{{review.reviewer}}" class="tohide" style="padding-top:10px;">
+        <div style="padding-bottom:10px;"><b>Has the student developed a significant project?</b></div>
+        <span class="label label-primary"><b>{{review.scores[0]}}/10</b></span>
+        <span>{{review.comments[0]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Is the student's plan for carrying out the project feasible?</b></div>
+        <span class="label label-primary"><b>{{review.scores[1]}}/10</b></span>
+        <span>{{review.comments[1]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Does the proposal include appropriate research components?</b></div>
+        <span class="label label-primary"><b>{{review.scores[2]}}/10</b></span>
+        <span>{{review.comments[2]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Will the project adequately use the three weeks allotted for May Project (30 hrs/week)?</b></div>
+        <span class="label label-primary"><b>{{review.scores[3]}}/10</b></span>
+        <span>{{review.comments[3]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Is this project likely to produce a significant result regardless of its "success"?</b></div>
+        <span class="label label-primary"><b>{{review.scores[4]}}/10</b></span>
+        <span>{{review.comments[4]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>If an Independent Project, is there an expert upon whose work or guidance the stuent might rely? If a Sponsored Project (shadowing, internships, or volunteering), is the plan appropriate and feasible?</b></div>
+        <span class="label label-primary"><b>{{review.scores[5]}}/10</b></span>
+        <span>{{review.comments[5]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Has the student described an appropriate way to evaluate the project upon completion?</b></div>
+        <span class="label label-primary"><b>{{review.scores[6]}}/10</b></span>
+        <span>{{review.comments[6]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Do plans for presenting and exhibiting the project appear likely to present the project well?</b></div>
+        <span class="label label-primary"><b>{{review.scores[7]}}/10</b></span>
+        <span>{{review.comments[7]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Does the proposal overall appear thoughtful and well planned out?</b></div>
+        <span class="label label-primary"><b>{{review.scores[8]}}/10</b></span>
+        <span>{{review.comments[8]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Do you expect that this project will reflect well on the student and U-High?</b></div>
+        <span class="label label-primary"><b>{{review.scores[9]}}/10</b></span>
+        <span>{{review.comments[9]}}</span>
+
+        <div style="padding-top:20px;padding-bottom:10px;"><b>Summary Comments:</b></div>
+        <span>{{review.summary_comments}}</span>
+        </div>
+      {% endfor %}
+      {% endif %}
     </div>
   </div>
 </body>
