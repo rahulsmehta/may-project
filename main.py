@@ -326,15 +326,19 @@ def upload(environ, start_response):
     start_response('302 Redirect',[('Location','/submit')])
     return []
 
+  if user.proposal_submitted == False:
+    user.proposal_submitted = True
+
+  if user.revisions_requested == True:
+    user.revisions_submitted = True
+
   user.proposal_filetype = filetype
   user.proposal_title = form_input(fs,'upload-title')
   user.project_type = form_input(fs,'upload-type')
-  print user.project_type
   user.project_supervisor = form_input(fs,'upload-supervisor')
   user.project_sponsor = form_input(fs,'upload-sponsor')
   user.proposal_authors = form_input(fs,'upload-author')
   user.proposal_summary = form_input(fs,'upload-summary')
-  user.proposal_submitted = True
   user.put()
 
   start_response('302 Redirect',[('Location','/user')])
@@ -462,10 +466,10 @@ def view_proposal(environ,start_response):
         student.proposal_approved = True
         student.proposal_status_pretty ="Proposal Approved"
       elif avg >= 30:
-        student.revisions_required = True
+        student.revisions_requested= True
         student.proposal_status_pretty = "Revisions Required"
       elif avg >= 25:
-        student.revisions_required = True
+        student.revisions_requested = True
         student.proposal_status_pretty = "Rewrite Required"
       else:
         student.proposal_status_pretty = "Not Approved"
@@ -566,9 +570,14 @@ def modify_reviewers(environ,start_response):
 #  reviewer_str = form_input(fs,'modify-reviewer')
 #  action = form_input(fs,'modify-action')
 
-  student= User.all().filter('email',form_input(fs,'modify-student').split('(')[1].strip(')')).get()
-  reviewer = User.all().filter('email',form_input(fs,'modify-reviewer').split('(')[1].strip(')')).get()
-  action = form_input(fs,'modify-action').lower()
+  try:
+    student= User.all().filter('email',form_input(fs,'modify-student').split('(')[1].strip(')')).get()
+    reviewer = User.all().filter('email',form_input(fs,'modify-reviewer').split('(')[1].strip(')')).get()
+    action = form_input(fs,'modify-action').lower()
+  except:
+    logging.error("Fields empty.")
+    start_response('302 Redirect',[('Location','/user')])
+    return [ ]
 
   student_str = str(student.key().id())
   reviewer_str = str(reviewer.key().id())

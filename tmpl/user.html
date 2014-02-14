@@ -45,6 +45,9 @@
             <li class={%if forms[2] == False %}"todo"{% else %}"done"{% endif %}>Form C: Sponsor's Agreement Form - Due Friday, February 21st</li>
             <li class={%if user.proposal_submitted == False %}"todo"{% else %}"done"{% endif %}><b>{% if user.proposal_submitted == True %}<a href="/view/{{user.key().id()}}">May Project Proposal</a>{% else %}May Project Proposal{%endif%}</b> - Due Friday, February 21st</li>
             <li class={%if forms[3] == False %}"todo"{% else %}"done"{% endif %}>Form D: Eligibility Form - Due Friday, May 1st</li>
+            {% if user.revisions_requested == True %}
+            <li class={%if user.revisions_submitted == False%}"todo"{% else %}"done"{% endif %}>Proposal Rewrites/Revisions - Due Monday, March 10th</li>
+            {% endif %}
         {% elif status == "reviewer" %}
             {% if assigned_users is defined %}
             {% for user in assigned_users %}
