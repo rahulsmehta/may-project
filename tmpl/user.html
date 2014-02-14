@@ -4,7 +4,7 @@
   <title>{{user_name}} | UCLS May Project Submission</title>
   <link rel="stylesheet" href="/bootstrap.min.css" type="text/css" />
   <style>
-    body{padding-top:100px;}
+    body{padding-top:100px;padding-bottom:50px;}
     .checklist{font-size:1.3em;}
     .todo{list-style-image:url('img/unchecked.png');}
     .done{list-style-image:url('img/checked.png');}
@@ -40,11 +40,11 @@
         <h4><u>{% if status == "student" %}May Project Checklist{% elif status =="reviewer" %}Assigned Proposals{% endif %}</u></h4> 
         <ul class="checklist">
         {% if status == "student" %}
-            <li class={%if forms[0] == False %}"todo"{% else %}"done"{% endif %}>Form A: May Project Supervisor Agreement Form - Due Friday, January 24th</li>
+            <li class={%if forms[0] == False %}"todo"{% else %}"done"{% endif %}>Form A: May Project Supervisor Agreement Form - Due Friday, January 31st</li>
             <li class={%if forms[1] == False %}"todo"{% else %}"done"{% endif %}>Form B: Parental Permission Form - Due Friday, February 21st</li>
             <li class={%if forms[2] == False %}"todo"{% else %}"done"{% endif %}>Form C: Sponsor's Agreement Form - Due Friday, February 21st</li>
             <li class={%if user.proposal_submitted == False %}"todo"{% else %}"done"{% endif %}><b>{% if user.proposal_submitted == True %}<a href="/view/{{user.key().id()}}">May Project Proposal</a>{% else %}May Project Proposal{%endif%}</b> - Due Friday, February 21st</li>
-            <li class={%if forms[3] == False %}"todo"{% else %}"done"{% endif %}>Form D: Eligibility Form - Due Friday, April 25th</li>
+            <li class={%if forms[3] == False %}"todo"{% else %}"done"{% endif %}>Form D: Eligibility Form - Due Friday, May 1st</li>
         {% elif status == "reviewer" %}
             {% if assigned_users is defined %}
             {% for user in assigned_users %}
@@ -88,7 +88,34 @@
         </form>
         <div style="padding-top:20px;">
         <h4>Begin Review Process</h4>
-        <a href="/review/start" class="btn btn-danger">Assign Reviewers</a>
+          <a href="/review/start" onclick="return confirm('Are you sure?')" class="btn btn-danger">Assign Reviewers</a>
+        </div>
+
+        <div style="padding-top:17px;">
+        <h4>Edit Reviewers</h4>
+        <form action="/api/modify" method="post"> <!-- TODO IMPLEMENT THIS HANDLER-->
+          <label style="padding-top:10px;" for="modify-student">Student<br/><label>
+          <select class="form-control input" id ="modify-student" name="modify-student">
+            {% for student in approved_students %}
+              <option>{{student.fullname}} ({{student.email}})</option>
+            {% endfor %}
+          </select>
+
+          <label style="padding-top:10px;" for="modify-reviewer">Reviewer<br/><label>
+          <select class="form-control input" id ="modify-reviewer" name="modify-reviewer">
+            {% for reviewer in reviewers %}
+              <option>{{reviewer.fullname}} ({{reviewer.email}})</option>
+            {% endfor %}
+          </select>
+
+          <label style="padding-top:10px;" for="modify-action">Action<br/><label>
+          <select class="form-control input" style="width:100px;" id ="modify-action" name="modify-action">
+            <option>Add</option>
+            <option>Delete</option>
+          </select>
+          <br/> 
+          <button type="submit" onclick="return confirm('Are you sure you wish to make this change?');" class="btn btn-default">Update Assignments</button>
+        </form>
         </div>
         {% endif %}
         {% if status == "student"%}

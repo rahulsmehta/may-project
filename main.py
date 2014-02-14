@@ -165,6 +165,7 @@ def user_view(environ,start_response):
       if pending_users.count() < 1:
         pending_users = None
       approved_students = User.all().filter('account_approved',True).filter('status','student').order('fullname')
+      reviewers = User.all().filter('account_approved',True).filter('status','reviewer').order('fullname')
 
       form_list = [ ]
       
@@ -320,8 +321,17 @@ def upload(environ, start_response):
   user.proposal = db.Blob(fs['upload-file'].file.read())
   
   fn = fs['upload-file'].filename.split(".")
-  user.proposal_filetype = fn[len(fn)-1]
+  filetype = fn[len(fn)-1]
+  if filetype != "doc" and filetype != "docx" and filetype != "pdf":
+    start_response('302 Redirect',[('Location','/submit')])
+    return []
+
+  user.proposal_filetype = filetype
   user.proposal_title = form_input(fs,'upload-title')
+  user.project_type = form_input(fs,'upload-type')
+  print user.project_type
+  user.project_supervisor = form_input(fs,'upload-supervisor')
+  user.project_sponsor = form_input(fs,'upload-sponsor')
   user.proposal_authors = form_input(fs,'upload-author')
   user.proposal_summary = form_input(fs,'upload-summary')
   user.proposal_submitted = True
@@ -437,14 +447,32 @@ def view_proposal(environ,start_response):
   
   parts = environ.get('PATH_INFO')[1:].split('/')
   student = User.get_by_id(int(parts[1]))
-
-  #TODO: add the third reviewer part!!!!!!!
-  #Begin third reviewer needed
-  student_reviews = Review.all().filter('submitter',str(student.key().id())) #Get all reviews for prop submitted by student
   
-  #Calculate whether or not there's a large differential
+  student_reviews = Review.all().filter('submitter',str(student.key().id())) #Get all reviews for prop submitted by student
 
+  #SET THE PROPER STATUS FOR THE USER DEPENDING ON THE AVERAGE
+  if student.proposal_approved == False:
+    if student_reviews.count() >= 2:
+      #Calculate the avg
+      total = 0
+      for r in student_reviews:
+        total += r.proposal_score()
+      avg = total/2
+      if avg >= 40:
+        student.proposal_approved = True
+        student.proposal_status_pretty ="Proposal Approved"
+      elif avg >= 30:
+        student.revisions_required = True
+        student.proposal_status_pretty = "Revisions Required"
+      elif avg >= 25:
+        student.revisions_required = True
+        student.proposal_status_pretty = "Rewrite Required"
+      else:
+        student.proposal_status_pretty = "Not Approved"
 
+      student.put()
+       
+    
   is_current_reviewer = False
   try:
     reviewers = [ ]
@@ -492,32 +520,80 @@ def review_proposal(environ,start_response):
     start_response('200 Okay', [ ])
     return [ jinja_environment.get_template('review.html').render(**locals()).encode('utf-8') ]
   elif environ['REQUEST_METHOD'] == "POST":
-    try:
-      r = Review.all().filter("submitter",str(parts[1])).filter("reviewer",str(user.key().id())).get()
-      r.delete()
-    except:
-      logging.error("No such review found.")
-
+    
+    location = None
     fs = make_field_storage(environ)
-    this_review = Review(
-      reviewer = str(user.key().id()),
-      reviewer_fullname = user.fullname,
-      submitter = str(student.key().id()),
-      scores = [ ],
-      comments = [ ],
-      summary_comments = None,
-      complete = False
-    )
-    for i in range(10):
-      add = str(i+1)
-      foo = int(form_input(fs,'q'+add+'-score'))
-      this_review.scores.append(foo)
-      this_review.comments.append(form_input(fs,'q'+add))
+    if user.status == "coordinator":
+      student.coordinator_status = form_input(fs,'coordinator-status')
+      student.put()
+      location = '/view/'+str(student.key().id())
 
-    this_review.summary_comments = form_input(fs,'comments')
-    this_review.complete = True
-    this_review.put()
+    else:
+      location = '/user'
+      student.proposal_approved = False
+      student.put()
+      r = Review.all().filter("submitter",str(parts[1])).filter("reviewer",str(user.key().id()))
+      if r.count() > 0:
+        for rev in r:
+          rev.delete()
 
-    start_response('302 Redirect', [('Location','/user')])
+      this_review = Review(
+        reviewer = str(user.key().id()),
+        reviewer_fullname = user.fullname,
+        submitter = str(student.key().id()),
+        scores = [ ],
+        comments = [ ],
+        summary_comments = None,
+        complete = False
+      )
+      for i in range(5):
+        add = str(i+1)
+        foo = int(form_input(fs,'q'+add+'-score'))
+        this_review.scores.append(foo)
+        this_review.comments.append(form_input(fs,'q'+add))
+
+      this_review.summary_comments = form_input(fs,'comments')
+      this_review.complete = True
+      this_review.put()
+
+      
+    start_response('302 Redirect', [('Location',location)])
     return [ ]
 
+def modify_reviewers(environ,start_response):
+  fs = make_field_storage(environ)
+#  student_str = form_input(fs,'modify-student')
+#  reviewer_str = form_input(fs,'modify-reviewer')
+#  action = form_input(fs,'modify-action')
+
+  student= User.all().filter('email',form_input(fs,'modify-student').split('(')[1].strip(')')).get()
+  reviewer = User.all().filter('email',form_input(fs,'modify-reviewer').split('(')[1].strip(')')).get()
+  action = form_input(fs,'modify-action').lower()
+
+  student_str = str(student.key().id())
+  reviewer_str = str(reviewer.key().id())
+
+  rev_list = reviewer.assigned_proposals
+
+  if action == "add":
+    if reviewer_str not in student.reviewers:
+      student.reviewers.append(reviewer_str)
+      print "Printing reviewer: "+reviewer_str
+      rev_list.append(student_str)
+  elif action == "delete":
+    if reviewer_str in student.reviewers:
+      student.reviewers.remove(reviewer_str)
+      rev_list.remove(student_str)
+      r = Review.all().filter("submitter",student_str).filter("reviewer",reviewer_str)
+      for rev in r:
+        rev.delete()
+
+
+
+  reviewer.assigned_proposals = rev_list
+  student.put()
+  reviewer.put()
+    
+
+  start_response('302 Redirect',[('Location','/user')])
+  return [ ]

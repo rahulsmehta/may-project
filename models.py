@@ -27,7 +27,8 @@ class User(db.Model):
   proposal_submitted = db.BooleanProperty()
   forms = db.ListProperty(item_type=bool)
   proposal_approved = db.BooleanProperty()
-  third_rev_needed = db.BooleanProperty()
+  proposal_status_pretty = db.StringProperty(default=None) #Pretty status for user printing
+  coordinator_status = db.StringProperty(default=None) #coordinator overrides everything
   revisions_requested = db.BooleanProperty()
   revisions_submitted = db.BooleanProperty()
   proposal = db.BlobProperty()
@@ -35,6 +36,9 @@ class User(db.Model):
   proposal_title = db.StringProperty()
   proposal_authors = db.StringProperty()
   proposal_summary = db.TextProperty()
+  project_supervisor = db.StringProperty()
+  project_sponsor = db.StringProperty()
+  project_type = db.StringProperty()
   status = db.StringProperty() # Can ONLY be one of the following: 'student,' 'reviewer,' 'coordinator,' 'admin'
   secret = db.StringProperty() # Student A, Student B, you get the point
 
@@ -61,11 +65,11 @@ class Review(db.Model):
   def proposal_status(self):
     total = self.proposal_score()
 
-    if total > 90:
+    if total > 39:
       return "approved"
-    elif total > 75:
+    elif total > 29:
       return "revisions"
-    elif total > 55:
+    elif total > 24:
       return "rewrite"
     else:
       return "not_approved"
@@ -73,11 +77,11 @@ class Review(db.Model):
   def status_pretty(self):
     total = self.proposal_score()
 
-    if total > 90:
+    if total > 39:
       return "Proposal Approved"
-    elif total > 75:
+    elif total > 29:
       return "Needs Revisions"
-    elif total > 55:
+    elif total > 24:
       return "Rewrite Required"
     else:
       return "Proposal Denied"

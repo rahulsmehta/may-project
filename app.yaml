@@ -62,3 +62,6 @@ handlers:
 - url: /view+(/[0-9]+)
   script: main.view_proposal
   secure: always
+- url: /api/modify
+  script: main.modify_reviewers
+  secure: always
