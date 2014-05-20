@@ -432,6 +432,17 @@ def coordinator_view(environ,start_response):
   start_response(status,headers)
   return [ ]
 
+
+"""
+WSGI handler for dumping all proposals
+"""
+def dump(environ,start_response):
+  proposals = User.all().filter('status','student').filter('account_approved',True)
+  start_response('200 Okay', [ ])
+  return [ jinja_environment.get_template('dump.html').render(**locals()).encode('utf-8') ]
+
+
+
 """
 WSGI handler for viewing proposals on a page
 """

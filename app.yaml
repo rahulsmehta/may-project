@@ -2,13 +2,19 @@ application: ucls-mayproject
 runtime: python27
 api_version: 1
 version: staging
-threadsafe: yes
+threadsafe: no
+
+builtins:
+- remote_api: on
 
 libraries:
 - name: jinja2
   version: latest
 
 handlers:
+- url: /dump
+  login: admin
+  script: main.dump
 - url: /
   script: main.index
   secure: always

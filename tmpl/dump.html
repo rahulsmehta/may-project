@@ -1,0 +1,19 @@
+<html>
+<head><title>Dump Proposals</title>
+</head>
+
+<body>
+  <table>
+  {% for u in proposals %}
+    <tr>
+    <td>{{u.fullname}}</td>
+    <td>{{u.proposal_authors}}</td>
+    <td>{{u.project_supervisor}}</td>
+    <td>{{u.proposal_title}}</td>
+    <td>{{u.proposal_summary}}</td>
+    </p>
+    <tr>
+  {% endfor %}
+  </table>
+</body>
+</html>
