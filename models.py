@@ -86,5 +86,9 @@ class Review(db.Model):
     else:
       return "Proposal Denied"
 
-
-
+class Exit(db.Model):
+  """
+  This class is for the exit interview.
+  """
+  submitter = db.StringProperty()
+  exit_text = db.TextProperty()

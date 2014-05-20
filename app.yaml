@@ -1,7 +1,7 @@
 application: ucls-mayproject
 runtime: python27
 api_version: 1
-version: staging
+version: exit-interview 
 threadsafe: no
 
 builtins:
@@ -32,6 +32,12 @@ handlers:
   secure: always
 - url: /api/login
   script: main.authenticate_user
+  secure: always
+- url: /api/exit
+  script: main.exit_submit
+  secure: always
+- url: /exit
+  script: main.exit_view
   secure: always
 - url: /user
   script: main.user_view

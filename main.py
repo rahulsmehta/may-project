@@ -159,6 +159,7 @@ def user_view(environ,start_response):
     if status == "student":
       proposal_submitted = user.proposal_submitted
       forms = user.forms
+      exit_submitted = True
 
     elif status == "coordinator":
       pending_users = User.all().filter('account_approved',False)
@@ -286,6 +287,30 @@ def submit_view(environ,start_response):
     start_response('302 Redirect',[('Location','/user')])
     return [ ]
 
+'''
+WSGI handler for exit interview submission
+'''
+
+def exit_view(environ,start_response):
+  user = None
+  try:
+    key = environ.get("HTTP_COOKIE").split('=')[1]
+    user = User.get(key)
+  except:
+    logging.error("No user authenticated.")
+  if user is None:
+    start_response('302 Redirect',[('Location','/')])
+    return []
+  else:
+    user_name = user.fullname
+    status = user.status
+
+  if status == "student":
+    start_response('200 Okay', [ ])
+    return [ jinja_environment.get_template('exit.html').render(**locals()).encode('utf-8') ]
+  else:
+    start_response('302 Redirect',[('Location','/user')])
+    return [ ]
 
 '''
 WSGI handler for account approval.
@@ -302,6 +327,34 @@ def account_auth(environ,start_response):
 
   start_response('302 Redirect',[('Location','/user')])
   return [ ]
+
+"""
+WSGI handler for submitting exit interviews.
+"""
+
+def exit_submit(environ, start_response):
+  user = None
+  try:
+    key = environ.get("HTTP_COOKIE").split('=')[1]
+    user = User.get(key)
+  except:
+    logging.error("No user authenticated.")
+  if user is None:
+    start_response('302 Redirect',[('Location','/')])
+    return []
+
+  fs = make_field_storage(environ)
+  user_input = form_input(fs,'exit-text')
+  uid = str(user.key().id())
+  this_exit = Exit(
+    submitter = uid,
+    exit_text = user_input
+  )
+  this_exit.put()
+
+  start_response('302 Redirect',[('Location','/user')])
+  return []
+
 
 def upload(environ, start_response):
   user = None
@@ -459,9 +512,16 @@ def view_proposal(environ,start_response):
   else:
     user_name = user.fullname
     status = user.status
-  
+
   parts = environ.get('PATH_INFO')[1:].split('/')
-  student = User.get_by_id(int(parts[1]))
+  student_id = parts[1]
+
+  if user.status == "student" and student_id != str(user.key().id()):
+    start_response('302 Redirect',[('Location','/')])
+    return []
+    
+  
+  student = User.get_by_id(int(student_id))
   
   student_reviews = Review.all().filter('submitter',str(student.key().id())) #Get all reviews for prop submitted by student
 
@@ -506,6 +566,10 @@ def view_proposal(environ,start_response):
     for rev in student_reviews:
       if rev.reviewer == str(user.key().id()):
         review = rev
+
+  if user.status == "student" or user.status == "coordinator":
+    e = Exit.all().filter("submitter",student_id).get()
+    exit_interview_text = e.exit_text
 
 
   start_response('200 Okay', [ ])
