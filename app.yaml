@@ -1,7 +1,7 @@
 application: ucls-mayproject
 runtime: python27
 api_version: 1
-version: exit-interview 
+version: staging 
 threadsafe: no
 
 builtins:
