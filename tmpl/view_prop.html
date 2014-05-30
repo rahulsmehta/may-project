@@ -65,6 +65,14 @@
       {% endif %}
       <br/>
 
+      {% if user.status == "coordinator" or user.status == "student" %}
+      <div><b>Exit Interview</b></div>
+      <div>
+        {{ exit_interview_text }}
+      </div>
+      <br/>
+      {% endif %}
+
       <div><a class="btn btn-default" href="/download/{{student.key().id()}}">Download Proposal</a></div><br/>
 
       {% if user.status == "reviewer" %}
